@@ -1,5 +1,10 @@
 package Mundo;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.PrintWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -21,16 +26,36 @@ public class Aplicacion extends JFrame
 	
 	public Aplicacion()
 	{
-		JLabel p;
-		try {
-			p = new JLabel(new ImageIcon(new URL("http://maps.googleapis.com/maps/api/staticmap?center=Brooklyn+Bridge,New+York,NY&zoom=13&size=600x300&maptype=roadmap&markers=color:blue%7Clabel:S%7C40.702147,-74.015794&markers=color:green%7Clabel:G%7C40.711614,-74.012318&markers=color:red%7Ccolor:red%7Clabel:C%7C40.718217,-73.998284&sensor=false")));
-			add(p);
-		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
 		
 	}
+	
+	public void construirMapaPorLatitudLongitud(String latitud, String longitud) throws Exception
+	{
+		if(longitud.equals("")||latitud.equals(""))
+		{
+			throw new Exception("Los datos no estan completos");
+		}
+		else
+		{
+			File mapa = new File("./datos/mapaFinal.html");
+				PrintWriter escritor = new PrintWriter(mapa);
+				BufferedReader lector = new BufferedReader(new FileReader(new File("./datos/mapa.html")));
+				String linea = lector.readLine();
+				while(linea!=null)
+				{
+					String texto = linea;
+					if(linea.contains("longitud")&& linea.contains("latitud"))
+					{
+						texto = texto.replace("longitud", longitud);
+						texto = texto.replace("latitud", latitud);
+					}
+					escritor.println(texto);
+					linea = lector.readLine();
+				}
+				escritor.close();
+				lector.close();
+			} 
+		}
+	}
 
-}
+

@@ -15,13 +15,16 @@ public class NodoArbol<T>
 	
 	private int estado;
 	
-	public NodoArbol(T nElemento)
+	private ArbolAVL arbol;
+	
+	public NodoArbol(T nElemento, ArbolAVL arb)
 	{
 		elemento = nElemento;
 		nodoDerecha = null;
 		padre = null;
 		nodoIzquierda = null;
 		estado = 0;
+		arbol =arb;
 	}
 
 	public T getElemento() {
@@ -106,7 +109,7 @@ public class NodoArbol<T>
 		}
 	}
 	
-	public void recursiveBalance(NodoArbol<T> actual) {
+	public void balance(NodoArbol<T> actual) {
 		  
 		  // we do not use the balance in this class, but the store it anyway
 		  calcularBalance(actual);
@@ -140,12 +143,12 @@ public class NodoArbol<T>
 		  // we did not reach the root yet
 		  if(actual.getPadre()!=null) 
 		  {
-			  recursiveBalance(actual.getPadre());
+			 balance(actual.getPadre());
 		  }
 		  else
 		  {
-			  this.root = actual;
-			  System.out.println("------------ Balancing finished ----------------");
+			  arbol.setRaiz(actual);
+			  System.out.println("------------Balance----------------");
 		  }
 	}
 
@@ -154,7 +157,66 @@ public class NodoArbol<T>
 		// TODO Auto-generated method stub
 		
 	}
+	
+	public void eliminar(NodoArbol<T> buscador,NodoArbol<T> buscado,Comparator<T> comparadorEliminacion) 
+	{
+		if(comparadorEliminacion.compare(buscado.getElemento(),buscador.getElemento())<0)  
+		{
+			eliminar(buscador.getNodoIzquierda(),buscado,comparadorEliminacion);
+		} 
+		else if(comparadorEliminacion.compare(buscado.getElemento(),buscador.getElemento())>0) 
+		{
+			eliminar(buscador.getNodoDerecha(),buscado,comparadorEliminacion);
+		}
+		else if(comparadorEliminacion.compare(buscado.getElemento(),buscador.getElemento())==0)
+		{
+			eliminarNodo(buscador);
+		}
+	}
 
+	private void eliminarNodo(NodoArbol<T> buscador) 
+	{
+		NodoArbol<T> referencia = null;
+		// at least one child of q, q will be removed directly
+		if(buscador.getNodoDerecha()==null || buscador.getNodoIzquierda()==null) 
+		{
+			// the root is deleted
+			if(buscador.getPadre()==null)
+			{
+				arbol.setRaiz(null);
+				buscador=null;
+			}
+		} 
+		else 
+		{
+			// q has two children --> will be replaced by successor
+			r = successor(q);
+			q.key = r.key;
+		}
 
+		AvlNode p;
+		if(r.left!=null) {
+			p = r.left;
+		} else {
+			p = r.right;
+		}
 
+		if(p!=null) {
+			p.parent = r.parent;
+		}
+
+		if(r.parent==null) {
+			this.root = p;
+		} else {
+			if(r==r.parent.left) {
+				r.parent.left=p;
+			} else {
+				r.parent.right = p;
+			}
+			// balancing must be done until the root is reached.
+			recursiveBalance(r.parent);
+		}
+		r = null;
+
+	}
 }
